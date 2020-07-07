@@ -31,6 +31,7 @@ const AboutNavigator = createStackNavigator(
         About: { screen: About }
     },
     {
+        
         navigationOptions: {
             headerStyle: {
                 backgroundColor: '#5637DD'
