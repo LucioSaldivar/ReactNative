@@ -3,6 +3,9 @@ import { Text, View, ScrollView, FlatList } from 'react-native';
 import { Card, Icon } from 'react-native-elements';
 import { COMMENTS } from '../shared/comments';
 import { CAMPSITES } from '../shared/campsites';
+import { connect } from 'react-redux';
+import { baseUrl } from '../shared/baseUrl';
+import { postFavorite } from '../redux/ActionCreators';
 
 function RenderComments({comments}) {
 
@@ -35,7 +38,7 @@ function RenderCampsite(props) {
         return (
             <Card
                 featuredTitle={campsite.name}
-                image={require('./images/react-lake.jpg')}>
+                image={{uri: baseUrl + campsite.image}}>
                 <Text style={{margin: 10}}>
                     {campsite.description}
                 </Text>
@@ -54,6 +57,18 @@ function RenderCampsite(props) {
     return <View />;
 }
 
+const mapStateToProps = state => {
+    return {
+        campsites: state.campsites,
+        comments: state.comments,
+        favorites: state.favorites
+    };
+};
+
+const mapDispatchToProps = {
+    postFavorite: campsiteId => (postFavorite(campsiteId))
+};
+
 
 class CampsiteInfo extends Component {
     
@@ -66,8 +81,8 @@ class CampsiteInfo extends Component {
         };
     }
 
-    markFavorite() {
-        this.setState({favorite: true});
+    markFavorite(campsiteId) {
+        this.props.postFavorite(campsiteId);
     }
 
     static navigationOptions = {
@@ -76,18 +91,18 @@ class CampsiteInfo extends Component {
 
     render() {
         const campsiteId = this.props.navigation.getParam('campsiteId');
-        const campsite = this.state.campsites.filter(campsite => campsite.id === campsiteId)[0];
-        const comments = this.state.comments.filter(comment => comment.campsiteId === campsiteId);
+        const campsite = this.props.campsites.campsites.filter(campsite => campsite.id === campsiteId)[0];
+        const comments = this.props.comments.comments.filter(comment => comment.campsiteId === campsiteId);
         return (
             <ScrollView>
                 <RenderCampsite campsite={campsite}
-                    favorite={this.state.favorite}
-                    markFavorite={() => this.markFavorite()}
+                    favorite={this.props.favorites.includes(campsiteId)}
+                    markFavorite={() => this.markFavorite(campsiteId)}
                 />
                 <RenderComments comments={comments} />
-            </ScrollView>
+            </ScrollView>  
         );
     }
 }
 
-export default CampsiteInfo;
+export default connect(mapStateToProps, mapDispatchToProps)(CampsiteInfo);
