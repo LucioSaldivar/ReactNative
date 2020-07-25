@@ -6,7 +6,7 @@ import { PersistGate } from 'redux-persist/es/integration/react';
 import Loading from './components/LoadingComponent';
 
 const { persistor, store } = ConfigureStore();
-
+console.disableYellowBox = true;
 export default function App() {
     return (
         <Provider store={store}>
